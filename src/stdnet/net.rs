@@ -3,7 +3,9 @@ use std::io;
 use std::mem;
 use std::net::Shutdown;
 use std::os::raw::c_int;
-use std::os::windows::io::{AsRawSocket, FromRawSocket, IntoRawSocket, RawSocket};
+use std::os::windows::io::{
+    AsRawSocket, AsSocket, BorrowedSocket, FromRawSocket, IntoRawSocket, RawSocket,
+};
 use std::path::Path;
 use std::time::Duration;
 
@@ -295,6 +297,12 @@ impl<'a> io::Write for &'a UnixStream {
 
     fn flush(&mut self) -> io::Result<()> {
         Ok(())
+    }
+}
+
+impl AsSocket for UnixStream {
+    fn as_socket(&self) -> BorrowedSocket {
+        self.0.as_socket()
     }
 }
 
