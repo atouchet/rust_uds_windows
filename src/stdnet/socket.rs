@@ -303,18 +303,21 @@ impl IntoRawSocket for Socket {
 
 impl AsSocket for Socket {
     fn as_socket(&self) -> BorrowedSocket<'_> {
+        // SAFETY: Although the lifetime is elided, it is indeed a borrow from self, and the returned value can not outlive the lifetime of the Socket.
         unsafe { BorrowedSocket::borrow_raw(self.as_raw_socket()) }
     }
 }
 
 impl From<Socket> for OwnedSocket {
     fn from(sock: Socket) -> OwnedSocket {
+        // SAFETY: This is safe because it consumes the socket using the `OwnedSocket::from(Socket)`, or by using `Socket.into::<OwnedSocket>()`
         unsafe { OwnedSocket::from_raw_socket(sock.into_raw_socket()) }
     }
 }
 
 impl From<OwnedSocket> for Socket {
     fn from(owned: OwnedSocket) -> Socket {
+        // SAFETY: This is safe because it consumes the socket using the `Socket::from(OwnedSocket)`, or by using `OwnedSocket.into::<Socket>()`
         unsafe { Socket::from_raw_socket(owned.into_raw_socket()) }
     }
 }
